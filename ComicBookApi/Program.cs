@@ -1,13 +1,25 @@
 var builder = WebApplication.CreateBuilder(args);
+var AllowFrontend = "_allowFrontend";
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: AllowFrontend,
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:4200")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseCors(AllowFrontend);
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
