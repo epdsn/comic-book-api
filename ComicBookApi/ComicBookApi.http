@@ -11,3 +11,43 @@ Accept: text/html
 ### Test Swagger JSON
 GET {{ComicBookApi_HostAddress}}/swagger/v1/swagger.json
 Accept: application/json
+
+### Test Auth API (for Angular frontend)
+GET {{ComicBookApi_HostAddress}}/api/auth/test
+Accept: application/json
+
+### Register a new user
+POST {{ComicBookApi_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "TestPassword123!",
+    "firstName": "John",
+    "lastName": "Doe",
+    "dateOfBirth": "1990-01-01T00:00:00Z"
+}
+
+### Login user
+POST {{ComicBookApi_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "TestPassword123!"
+}
+
+### Get user profile (requires authentication)
+GET {{ComicBookApi_HostAddress}}/api/auth/profile
+Authorization: Bearer {{auth_token}}
+
+### Update user profile (requires authentication)
+PUT {{ComicBookApi_HostAddress}}/api/auth/profile
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Smith",
+    "dateOfBirth": "1990-01-01T00:00:00Z"
+}

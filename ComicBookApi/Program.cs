@@ -17,7 +17,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 // JWT Settings
-var jwtKey = "your_jwt_secret_key_123"; // Replace with your actual secret key
+var jwtKey = "your_super_secret_jwt_key_that_is_at_least_32_characters_long_for_hs256"; // At least 32 chars for HS256
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -43,9 +43,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: AllowFrontend,
                       policy =>
                       {
-                          policy.WithOrigins("https://localhost:4200")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
+                          policy.WithOrigins(
+                              "https://localhost:4200",  // Angular default HTTPS
+                              "http://localhost:4200",   // Angular default HTTP
+                              "https://localhost:4201",  // Alternative Angular port
+                              "http://localhost:4201"    // Alternative Angular port
+                          )
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials()
+                          .WithExposedHeaders("Content-Disposition"); // For file downloads if needed
                       });
 });
 builder.Services.AddEndpointsApiExplorer();
@@ -63,6 +70,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add authentication and authorization middleware
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 var summaries = new[]
