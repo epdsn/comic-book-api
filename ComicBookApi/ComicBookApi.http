@@ -1,9 +1,5 @@
 @ComicBookApi_HostAddress = http://localhost:5292
 
-### Test Weather Forecast API
-GET {{ComicBookApi_HostAddress}}/weatherforecast
-Accept: application/json
-
 ### Test Swagger Documentation
 GET {{ComicBookApi_HostAddress}}/swagger
 Accept: text/html
