@@ -1,22 +1,22 @@
-# Comic Book Subscription API
+# Comic Book API
 
-A modern REST API for managing a comic book subscription service, built with ASP.NET Core 8.0 and Swagger documentation.
+A .NET 8 Web API for managing comic books with JWT authentication and user management, built with ASP.NET Core 8.0 and Swagger documentation.
 
 ## 🚀 Features
 
-- **Comic Book Management**: Add, update, and manage comic book catalog
-- **Subscription Management**: Handle user subscriptions and billing
-- **User Management**: User registration, authentication, and profiles
-- **Reading Progress**: Track reading progress and bookmarks
-- **Recommendations**: Personalized comic book recommendations
-- **RESTful API**: Clean, intuitive API endpoints
+- **JWT Authentication**: Secure user authentication with JWT tokens
+- **User Management**: User registration, login, and profile management
+- **CORS Support**: Configured for Angular frontend integration
 - **Swagger Documentation**: Interactive API documentation
 - **Modern Architecture**: Built with .NET 8.0 and best practices
+- **In-Memory Database**: Development-ready with Entity Framework Core
 
 ## 🛠️ Tech Stack
 
 - **Framework**: ASP.NET Core 8.0
 - **Language**: C#
+- **Authentication**: JWT Bearer tokens
+- **Database**: Entity Framework Core with Identity
 - **Documentation**: Swagger/OpenAPI
 - **Development**: Visual Studio 2022 / VS Code
 
@@ -59,37 +59,47 @@ The API will be available at:
 
 ## 🧪 Testing the API
 
-### Quick Test Command
+### Quick Test Commands
 
 ```bash
-# Test the weather forecast endpoint (currently working)
-curl http://localhost:5292/weatherforecast
+# Test the auth API connection
+curl http://localhost:5292/api/auth/test
 
-# Test with verbose output
-curl -v http://localhost:5292/weatherforecast
+# Test user registration
+curl -X POST http://localhost:5292/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"TestPassword123!","firstName":"John","lastName":"Doe","dateOfBirth":"1990-01-01T00:00:00Z"}'
+
+# Test user login
+curl -X POST http://localhost:5292/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"TestPassword123!"}'
 
 # Test Swagger documentation
 curl http://localhost:5292/swagger
 ```
 
-### Expected JSON Response
+### Expected API Responses
 
+**Registration Success:**
 ```json
-[
-  {
-    "date": "2025-07-28",
-    "temperatureC": 51,
-    "summary": "Hot",
-    "temperatureF": 123
-  },
-  {
-    "date": "2025-07-29",
-    "temperatureC": 43,
-    "summary": "Balmy",
-    "temperatureF": 109
+{
+  "message": "User registered successfully"
+}
+```
+
+**Login Success:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "user-id",
+    "email": "test@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "isPremium": false
   }
-  // ... more forecast entries
-]
+}
 ```
 
 ## 📚 API Documentation
@@ -106,12 +116,15 @@ This provides a complete overview of all available endpoints, request/response s
 ```
 comic-book-api/
 ├── ComicBookApi/                 # Main API project
-│   ├── bin/                      # Build output (ignored by git)
-│   ├── obj/                      # Build artifacts (ignored by git)
+│   ├── Controllers/              # API controllers
+│   │   └── AuthController.cs     # Authentication endpoints
+│   ├── Models/                   # Data models
+│   │   └── ApplicationUser.cs    # User model with Identity
+│   ├── Data/                     # Database context
+│   │   └── ApplicationDbContext.cs
 │   ├── Properties/               # Launch settings and configuration
 │   ├── Program.cs                # Application entry point
 │   ├── appsettings.json          # Configuration files
-│   ├── appsettings.Development.json
 │   ├── ComicBookApi.csproj       # Project file
 │   └── ComicBookApi.http         # HTTP test file
 ├── README.md                     # This file
@@ -123,58 +136,21 @@ comic-book-api/
 
 The application uses `appsettings.json` for configuration. Key settings include:
 
+- JWT token configuration
+- CORS settings for frontend integration
 - Logging configuration
 - Environment-specific settings
-- Allowed hosts configuration
-
-## 🧪 Development
-
-### Running in Development Mode
-
-```bash
-dotnet run --environment Development
-```
-
-### Building the Project
-
-```bash
-dotnet build
-```
-
-### Running Tests
-
-```bash
-dotnet test
-```
-
-### Troubleshooting
-
-#### Port Already in Use
-If you get "address already in use" error:
-
-```bash
-# Kill processes using port 5292
-sudo lsof -ti:5292 | xargs kill -9
-
-# Or use a different port
-dotnet run --urls "http://localhost:5000"
-```
-
-#### Project Not Found
-Make sure you're in the correct directory:
-
-```bash
-# Navigate to the project directory
-cd ComicBookApi
-
-# Then run
-dotnet run
-```
 
 ## 📝 Current API Endpoints
 
-### Working Endpoints
-- `GET /weatherforecast` - Get 5-day weather forecast (example endpoint)
+### Authentication Endpoints
+- `GET /api/auth/test` - Test API connection
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user (returns JWT token)
+- `GET /api/auth/profile` - Get user profile (requires authentication)
+- `PUT /api/auth/profile` - Update user profile (requires authentication)
+
+### Documentation Endpoints
 - `GET /swagger` - Access Swagger UI documentation
 - `GET /swagger/v1/swagger.json` - Get OpenAPI specification
 
@@ -193,27 +169,63 @@ dotnet run
 - `PUT /api/subscriptions/{id}` - Update subscription
 - `DELETE /api/subscriptions/{id}` - Cancel subscription
 
-#### Users
-- `GET /api/users` - Get all users
-- `GET /api/users/{id}` - Get user by ID
-- `POST /api/users` - Register new user
-- `PUT /api/users/{id}` - Update user profile
-
 ## 🎯 HTTP Test File
 
-The project includes `ComicBookApi.http` with ready-to-use test requests:
+The project includes `ComicBookApi.http` with ready-to-use test requests for all authentication endpoints.
 
-```http
-@ComicBookApi_HostAddress = http://localhost:5292
+## 🔐 Authentication
 
-### Test Weather Forecast API
-GET {{ComicBookApi_HostAddress}}/weatherforecast
-Accept: application/json
+The API uses JWT (JSON Web Tokens) for authentication:
 
-### Test Swagger Documentation
-GET {{ComicBookApi_HostAddress}}/swagger
-Accept: text/html
+1. **Register** a new user to create an account
+2. **Login** to receive a JWT token
+3. **Include the token** in the Authorization header for protected endpoints:
+   ```
+   Authorization: Bearer <your-jwt-token>
+   ```
+
+## 🌐 Frontend Integration
+
+The API is configured with CORS to work with Angular frontends:
+- Supports `localhost:4200` and `localhost:4201`
+- Handles both HTTP and HTTPS
+- Allows credentials and custom headers
+
+## 🧪 Development
+
+### Running in Development Mode
+
+```bash
+dotnet run --environment Development
 ```
+
+### Building the Project
+
+```bash
+dotnet build
+```
+
+### Testing with HTTP File
+
+Use the provided `ComicBookApi.http` file in VS Code or your preferred HTTP client to test all endpoints.
+
+### Troubleshooting
+
+#### Port Already in Use
+If you get "address already in use" error:
+
+```bash
+# Kill processes using port 5292
+sudo lsof -ti:5292 | xargs kill -9
+
+# Or use a different port
+dotnet run --urls "http://localhost:5000"
+```
+
+#### Authentication Issues
+- Ensure JWT token is included in Authorization header
+- Check token expiration (24 hours by default)
+- Verify email/password for login
 
 ## 🤝 Contributing
 
@@ -239,12 +251,10 @@ If you encounter any issues or have questions:
 
 - [x] Basic API setup with ASP.NET Core 8.0
 - [x] Swagger documentation integration
-- [x] Example weather forecast endpoint
-- [x] Project documentation and .gitignore
-- [ ] Replace weather forecast with comic book endpoints
-- [ ] Database integration (Entity Framework Core)
-- [ ] Authentication and authorization (JWT)
-- [ ] User management endpoints
+- [x] JWT authentication system
+- [x] User registration and login
+- [x] Profile management
+- [x] CORS configuration for Angular
 - [ ] Comic book catalog management
 - [ ] Subscription and billing system
 - [ ] Reading progress tracking
@@ -261,8 +271,10 @@ If you encounter any issues or have questions:
 ✅ **API is running and working!**
 - Port: 5292
 - Status: Development environment
-- Weather forecast endpoint: ✅ Working
+- Authentication: ✅ JWT implemented
+- User management: ✅ Working
 - Swagger documentation: ✅ Available
+- Angular integration: ✅ CORS configured
 - Ready for comic book features development
 
 ---
