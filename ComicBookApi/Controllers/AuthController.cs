@@ -129,8 +129,8 @@ public class AuthController : ControllerBase
         
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id ?? string.Empty),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.Name, $"{user.FirstName} {user.LastName}"),
             new Claim("isPremium", user.IsPremium.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
