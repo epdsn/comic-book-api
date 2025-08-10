@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace ComicApi.Controllers
+namespace ComicBookApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TestController : ControllerBase
+    public class HealthzController : ControllerBase
     {
         [HttpGet("ping")]
         public IActionResult Ping()
         {
-            return Ok(new { message = "Comic Book API is alive" });
+            return Ok(new { message = "Comic Book API is alive and well!" });
         }
     }
 }

@@ -24,12 +24,6 @@ namespace ComicBookApi.Controllers
             _signInManager = signInManager;
         }
 
-        [HttpGet("test")]
-        public IActionResult Test()
-        {
-            return Ok(new { message = "Auth API is working!", timestamp = DateTime.UtcNow });
-        }
-
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
