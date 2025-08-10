@@ -3,6 +3,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
+using ComicBookApi.Data;
+using ComicBookApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
