@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Linq;
 using System.Text.Json;
+using ComicBookApi.TestUtilities;
 
 namespace ComicBookApi.Test
 {
