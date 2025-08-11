@@ -6,17 +6,21 @@ A .NET 8 Web API for managing comic books with JWT authentication and user manag
 
 - **JWT Authentication**: Secure user authentication with JWT tokens
 - **User Management**: User registration, login, and profile management
+- **Comic Book Management**: Full CRUD operations for comic books
+- **Repository Pattern**: Clean separation of concerns with interfaces
+- **Test-Driven Development**: Comprehensive test coverage with xUnit and Moq
 - **CORS Support**: Configured for Angular frontend integration
 - **Swagger Documentation**: Interactive API documentation
 - **Modern Architecture**: Built with .NET 8.0 and best practices
-- **In-Memory Database**: Development-ready with Entity Framework Core
+- **In-Memory Storage**: Development-ready with in-memory collections
 
 ## 🛠️ Tech Stack
 
 - **Framework**: ASP.NET Core 8.0
 - **Language**: C#
 - **Authentication**: JWT Bearer tokens
-- **Database**: Entity Framework Core with Identity
+- **Testing**: xUnit with Moq for mocking
+- **Architecture**: Repository pattern with dependency injection
 - **Documentation**: Swagger/OpenAPI
 - **Development**: Visual Studio 2022 / VS Code
 
@@ -59,6 +63,19 @@ The API will be available at:
 
 ## 🧪 Testing the API
 
+### Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run tests with verbose output
+dotnet test --verbosity normal
+
+# Run specific test project
+dotnet test ComicBookApi.Test
+```
+
 ### Quick Test Commands
 
 ```bash
@@ -74,6 +91,9 @@ curl -X POST http://localhost:5292/api/auth/register \
 curl -X POST http://localhost:5292/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"TestPassword123!"}'
+
+# Test comic books API
+curl http://localhost:5292/api/comicbooks
 
 # Test Swagger documentation
 curl http://localhost:5292/swagger
@@ -117,9 +137,14 @@ This provides a complete overview of all available endpoints, request/response s
 comic-book-api/
 ├── ComicBookApi/                 # Main API project
 │   ├── Controllers/              # API controllers
-│   │   └── AuthController.cs     # Authentication endpoints
+│   │   ├── AuthController.cs     # Authentication endpoints
+│   │   └── ComicBooksController.cs # Comic book CRUD endpoints
 │   ├── Models/                   # Data models
-│   │   └── ApplicationUser.cs    # User model with Identity
+│   │   ├── ApplicationUser.cs    # User model with Identity
+│   │   └── ComicBook.cs          # Comic book data model
+│   ├── Repositories/             # Data access layer
+│   │   ├── IComicBookRepository.cs # Repository interface
+│   │   └── ComicBookRepository.cs  # Repository implementation
 │   ├── Data/                     # Database context
 │   │   └── ApplicationDbContext.cs
 │   ├── Properties/               # Launch settings and configuration
@@ -127,6 +152,11 @@ comic-book-api/
 │   ├── appsettings.json          # Configuration files
 │   ├── ComicBookApi.csproj       # Project file
 │   └── ComicBookApi.http         # HTTP test file
+├── ComicBookApi.Test/            # Test project
+│   ├── AuthControllerTests.cs    # Authentication tests
+│   ├── ComicBooksControllerTests.cs # Comic book tests
+│   ├── TestUtilities.cs          # Test data and utilities
+│   └── ComicBookApi.Test.csproj  # Test project file
 ├── README.md                     # This file
 ├── .gitignore                    # Git ignore rules
 └── comic-book-api.sln           # Solution file
@@ -150,18 +180,34 @@ The application uses `appsettings.json` for configuration. Key settings include:
 - `GET /api/auth/profile` - Get user profile (requires authentication)
 - `PUT /api/auth/profile` - Update user profile (requires authentication)
 
+### Comic Book Data Model
+```json
+{
+  "id": 1,
+  "title": "The Awakening",
+  "series": "Dark Lobo",
+  "issue": "#1",
+  "coverImage": "https://via.placeholder.com/300x400/1a1a2e/ffffff?text=Dark+Lobo+1",
+  "description": "In a world where darkness reigns, one hero emerges to challenge the shadows.",
+  "genre": "Superhero",
+  "rating": 4.5,
+  "price": 3.99,
+  "releaseDate": "2024-01-15T00:00:00Z"
+}
+```
+
 ### Documentation Endpoints
 - `GET /swagger` - Access Swagger UI documentation
 - `GET /swagger/v1/swagger.json` - Get OpenAPI specification
 
-### Planned Endpoints
+### Comic Book Endpoints
+- `GET /api/comicbooks` - Get all comic books
+- `GET /api/comicbooks/{id}` - Get comic book by ID
+- `POST /api/comicbooks` - Add new comic book
+- `PUT /api/comicbooks/{id}` - Update comic book
+- `DELETE /api/comicbooks/{id}` - Delete comic book
 
-#### Comic Books
-- `GET /api/comics` - Get all comic books
-- `GET /api/comics/{id}` - Get comic book by ID
-- `POST /api/comics` - Add new comic book
-- `PUT /api/comics/{id}` - Update comic book
-- `DELETE /api/comics/{id}` - Delete comic book
+### Planned Endpoints
 
 #### Subscriptions
 - `GET /api/subscriptions` - Get user subscriptions
@@ -172,6 +218,24 @@ The application uses `appsettings.json` for configuration. Key settings include:
 ## 🎯 HTTP Test File
 
 The project includes `ComicBookApi.http` with ready-to-use test requests for all authentication endpoints.
+
+## 🏛️ Architecture
+
+### Repository Pattern
+The application follows the Repository pattern for clean separation of concerns:
+
+- **Interfaces**: Define contracts for data access (`IComicBookRepository`)
+- **Implementations**: Concrete implementations of data access logic
+- **Dependency Injection**: Controllers depend on interfaces, not concrete classes
+- **Testability**: Easy to mock dependencies for unit testing
+
+### Test-Driven Development
+The project follows TDD principles:
+
+- **Red-Green-Refactor**: Write failing tests first, implement minimal code, then refactor
+- **Comprehensive Coverage**: 18 tests covering all CRUD operations
+- **Mocking**: Uses Moq for dependency mocking
+- **Test Utilities**: Reusable test data and helper methods
 
 ## 🔐 Authentication
 
@@ -255,14 +319,17 @@ If you encounter any issues or have questions:
 - [x] User registration and login
 - [x] Profile management
 - [x] CORS configuration for Angular
-- [ ] Comic book catalog management
+- [x] Comic book catalog management
+- [x] Repository pattern implementation
+- [x] Test-driven development setup
+- [x] Comprehensive test coverage
 - [ ] Subscription and billing system
 - [ ] Reading progress tracking
 - [ ] Recommendation engine
 - [ ] File upload for comic covers
 - [ ] Search and filtering
 - [ ] Rate limiting and caching
-- [ ] Unit and integration tests
+- [ ] Database integration (Entity Framework)
 - [ ] Docker containerization
 - [ ] CI/CD pipeline
 
@@ -273,9 +340,12 @@ If you encounter any issues or have questions:
 - Status: Development environment
 - Authentication: ✅ JWT implemented
 - User management: ✅ Working
+- Comic book management: ✅ Full CRUD implemented
+- Repository pattern: ✅ Clean architecture
+- Test coverage: ✅ 18 tests passing
 - Swagger documentation: ✅ Available
 - Angular integration: ✅ CORS configured
-- Ready for comic book features development
+- Ready for additional features development
 
 ---
 
